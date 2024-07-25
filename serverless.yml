@@ -1,0 +1,54 @@
+service: coolai-prototype
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:Query
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:provider.stage}-sensorData
+
+functions:
+  generateMockData:
+    handler: src/mockDataGenerator.handler
+    events:
+      - schedule: rate(5 minutes)
+  processData:
+    handler: src/dataProcessor.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn: 
+            Fn::GetAtt: [SensorDataTable, StreamArn]
+  optimizeAC:
+    handler: src/acOptimizer.handler
+    events:
+      - http:
+          path: optimize
+          method: post
+
+resources:
+  Resources:
+    SensorDataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-sensorData
+        AttributeDefinitions:
+          - AttributeName: sensorId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: sensorId
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
