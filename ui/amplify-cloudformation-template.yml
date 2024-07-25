@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for CoolAI Amplify app'
+
+Parameters:
+  Repository:
+    Type: String
+    Description: 'GitHub repository URL'
+  Branch:
+    Type: String
+    Description: 'Branch name'
+  OAuthToken:
+    Type: String
+    Description: 'GitHub personal access token'
+    NoEcho: true
+  APIEndpoint:
+    Type: String
+    Description: 'API Gateway endpoint URL'
+
+Resources:
+  AmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: CoolAI
+      Repository: !Ref Repository
+      AccessToken: !Ref OAuthToken
+      EnvironmentVariables:
+        - Name: REACT_APP_API_ENDPOINT
+          Value: !Ref APIEndpoint
+      BuildSpec: |-
+        version: 1
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - npm ci
+            build:
+              commands:
+                - npm run build
+          artifacts:
+            baseDirectory: build
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - node_modules/**/*
+
+  AmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt AmplifyApp.AppId
+      BranchName: !Ref Branch
+      EnableAutoBuild: true
+
+Outputs:
+  DefaultDomain:
+    Value: !GetAtt AmplifyApp.DefaultDomain
