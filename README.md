@@ -1,4 +1,4 @@
-# EcoTech Innovation Challenge Proposal: AI-Powered Air Conditioning Optimization
+# AI-Powered Air Conditioning Optimization "CoolAI"
 
 ## Solution Overview
 
