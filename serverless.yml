@@ -20,13 +20,13 @@ provider:
 
 functions:
   generateMockData:
-    handler: src/mockDataGenerator.handler
+    handler: index.generateMockData
     events:
       - schedule: rate(5 minutes)
     environment:
       SENSOR_DATA_TABLE: ${self:service}-${self:provider.stage}-sensorData
   processData:
-    handler: src/dataProcessor.handler
+    handler: index.processData
     events:
       - stream:
           type: dynamodb
@@ -35,7 +35,7 @@ functions:
     environment:
       SENSOR_DATA_TABLE: ${self:service}-${self:provider.stage}-sensorData
   optimizeAC:
-    handler: src/acOptimizer.handler
+    handler: index.optimizeAC
     events:
       - http:
           path: optimize
