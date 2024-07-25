@@ -1,14 +1,17 @@
-const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
+import React from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export const fetchOptimizationData = async () => {
-  try {
-    const response = await fetch(API_ENDPOINT);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching optimization data:', error);
-    throw error;
-  }
-};
+const TemperatureChart = ({ data }) => (
+  <ResponsiveContainer width="100%" height={300}>
+    <AreaChart data={data}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="timestamp" tickFormatter={(ts) => new Date(ts).toLocaleTimeString()} />
+      <YAxis />
+      <Tooltip labelFormatter={(ts) => new Date(ts).toLocaleString()} />
+      <Area type="monotone" dataKey="averageTemp" stroke="#8884d8" fill="#8884d8" name="Average Temp" />
+      <Area type="monotone" dataKey="optimizedTemp" stroke="#82ca9d" fill="#82ca9d" name="Optimized Temp" />
+    </AreaChart>
+  </ResponsiveContainer>
+);
+
+export default TemperatureChart;
