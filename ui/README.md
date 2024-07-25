@@ -113,17 +113,6 @@ Contributions to the CoolAI Dashboard are welcome. Please follow these steps to 
 4. Push to the branch: `git push origin feature/your-feature-name`.
 5. Submit a pull request.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-If you have any questions or feedback, please contact the project maintainers:
-
-- Your Name - your.email@example.com
-- Project Link: https://github.com/your-username/coolai-ui
-
 ## Acknowledgements
 
 - [React](https://reactjs.org/)
