@@ -1,0 +1,21 @@
+{
+  "name": "coolai-prototype",
+  "version": "1.0.0",
+  "description": "CoolAI Prototype using Serverless Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.385.0",
+    "@aws-sdk/lib-dynamodb": "^3.385.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.33.0",
+    "serverless-esbuild": "^1.46.0",
+    "esbuild": "^0.19.0"
+  }
+}
