@@ -1,24 +1,30 @@
 service: coolai-prototype
 
+frameworkVersion: '3'
+
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:UpdateItem
-        - dynamodb:Query
-      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:provider.stage}-sensorData
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:provider.stage}-sensorData
 
 functions:
   generateMockData:
     handler: src/mockDataGenerator.handler
     events:
       - schedule: rate(5 minutes)
+    environment:
+      SENSOR_DATA_TABLE: ${self:service}-${self:provider.stage}-sensorData
   processData:
     handler: src/dataProcessor.handler
     events:
@@ -26,12 +32,16 @@ functions:
           type: dynamodb
           arn: 
             Fn::GetAtt: [SensorDataTable, StreamArn]
+    environment:
+      SENSOR_DATA_TABLE: ${self:service}-${self:provider.stage}-sensorData
   optimizeAC:
     handler: src/acOptimizer.handler
     events:
       - http:
           path: optimize
           method: post
+    environment:
+      SENSOR_DATA_TABLE: ${self:service}-${self:provider.stage}-sensorData
 
 resources:
   Resources:
@@ -52,3 +62,19 @@ resources:
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
+
+plugins:
+  - serverless-esbuild
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: 
+      - aws-sdk
+    target: node20
+    define:
+      require.resolve: undefined
+    platform: node
+    concurrency: 10
