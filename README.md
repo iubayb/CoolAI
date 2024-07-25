@@ -106,5 +106,141 @@ Our pitch will include:
 - Visualization of potential energy savings and environmental impact
 - Clear explanation of the AI/ML models and their benefits
 
+# Backend Deployment Guide
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+1. Node.js (v20.x or later) and npm installed
+2. AWS CLI installed and configured with your AWS credentials
+3. Serverless Framework v3 installed globally:
+   ```
+   npm install -g serverless@3
+   ```
+4. Git (for version control)
+
+## Project Structure
+
+Ensure your project structure looks like this:
+
+```
+coolai-prototype/
+├── src/
+│   ├── mockDataGenerator.js
+│   ├── dataProcessor.js
+│   └── acOptimizer.js
+├── index.js
+├── serverless.yml
+├── package.json
+└── deployment.md (this file)
+```
+
+## Deployment Steps
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/iubayb/CoolAI.git
+   cd CoolAI
+   ```
+
+2. Install project dependencies:
+   ```
+   npm install
+   ```
+
+3. Deploy the application:
+   ```
+   serverless deploy
+   ```
+   
+   To deploy to a specific stage or region:
+   ```
+   serverless deploy --stage production --region us-west-2
+   ```
+
+4. After successful deployment, note the endpoints and other outputs provided in the terminal. You'll need these to configure your frontend application.
+
+## Configuration Details
+
+The `serverless.yml` file defines the following:
+
+- Service name: coolai-prototype
+- Framework version: 3
+- Provider: AWS with Node.js 20.x runtime
+- Three Lambda functions:
+  - `generateMockData`: Runs every 5 minutes
+  - `processData`: Triggered by DynamoDB stream
+  - `optimizeAC`: Exposed as an HTTP POST endpoint
+- DynamoDB table: `${self:service}-${self:provider.stage}-sensorData`
+- IAM role with permissions for DynamoDB operations
+
+## Environment Variables
+
+Each function has access to the following environment variable:
+- `SENSOR_DATA_TABLE`: The name of the DynamoDB table
+
+## Plugins
+
+This project uses the `serverless-esbuild` plugin for bundling:
+- Bundle is enabled
+- Minification is disabled
+- Sourcemaps are generated
+- AWS SDK is excluded from the bundle
+- Targeting Node.js 20
+
+## Updating the Deployment
+
+To update your deployment after making changes:
+
+1. Make your code changes
+2. Run `serverless deploy` again
+
+## Removing the Deployment
+
+To remove all deployed resources:
+
+```
+serverless remove
+```
+
+**Caution**: This will delete all resources created by this Serverless application in AWS.
+
+## Viewing Logs
+
+To view logs for a specific function:
+
+```
+serverless logs -f functionName
+```
+
+Replace `functionName` with `generateMockData`, `processData`, or `optimizeAC`.
+
+## Troubleshooting
+
+1. If deployment fails, check the CloudFormation console in the AWS Management Console for detailed error messages.
+2. Ensure your AWS CLI is configured with the correct credentials and has the necessary permissions.
+3. Verify that your `serverless.yml` file is correctly formatted.
+4. If you're having issues with the `serverless-esbuild` plugin, try clearing the `.esbuild` cache directory.
+
+## Best Practices
+
+1. Use different stages (e.g., dev, staging, prod) for different environments.
+2. Regularly review and update the IAM permissions to ensure least privilege access.
+3. Set up CloudWatch alarms for monitoring your Lambda functions and DynamoDB table.
+4. Implement proper error handling and logging in your Lambda functions for easier debugging.
+
+## Additional Resources
+
+- [Serverless Framework Documentation](https://www.serverless.com/framework/docs/)
+- [AWS Lambda Developer Guide](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
+- [DynamoDB Developer Guide](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html)
+
+## Support
+
+If you encounter any issues or have questions about deploying the CoolAI prototype, please open an issue in the [project repository](https://github.com/iubayb/CoolAI).
+
+Remember to keep this deployment guide updated as your project evolves and deployment processes change.
+
 By leveraging cutting-edge AI and AWS services, CoolAI presents a innovative, impactful, and scalable solution to optimize air conditioning systems, significantly reducing energy consumption and carbon emissions in buildings worldwide.
 
